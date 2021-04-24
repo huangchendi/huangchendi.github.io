@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Intro to MapView - Create a 2D map</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.18/"></script>
+
+    <script>
+
+        var tmpBaseMap ="";
+        var flayer ="";
+
+        require(["esri/Map", "esri/views/MapView","esri/layers/FeatureLayer","esri/widgets/Legend",
+        "esri/widgets/Search",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/BasemapGallery",
+        "esri/widgets/LayerList"], (Map, MapView,FeatureLayer,Legend,Search,ScaleBar,BasemapGallery,LayerList) => {
+
+          flayer = new FeatureLayer({
+            url:"http://www.arcgisonline.cn/server/rest/services/Hosted/CN_34Capital_Population20210421/FeatureServer"
+        });
+
+        map = new Map({
+          basemap: "topo-vector"
+        });
+        
+        tmpBaseMap = map;
+
+        tmpBaseMap.layers.add(flayer);
+        view = new MapView({
+          container: "viewDiv", 
+          map: map, 
+          zoom: 4, 
+          center: [119, 32] 
+        });
+
+        var legend = new Legend({
+            view: view,
+            layerInfos: [{
+                layer: flayer,
+                title: "Legend"
+            }]
+        });
+
+        view.ui.add(legend, "bottom-right");
+       
+       const searchWidget = new Search({
+           view: view
+       });
+
+        view.ui.add(searchWidget, {
+            position: "top-right",
+            index: 2
+        });
+
+        var scaleBar = new ScaleBar({
+            view: view,
+            style:"ruler",
+            unit:"metric"
+        });
+
+        // Add widget to the bottom left corner of the view
+        view.ui.add(scaleBar, {
+  
+            position: "bottom-left"
+        });  
+        
+        var layerList = new LayerList({
+            view: view
+        });
+
+        // Adds widget below other elements in the top left corner of the view
+        view.ui.add(layerList, {
+            position: "top-left"
+        });
+
+        var basemapGallery = new BasemapGallery({
+            view: view,
+            showArcGISBasemaps: true,
+            container: "baseGallery",
+        });
+
+        // Add widget to the top right corner of the view
+            view.ui.add(basemapGallery, {
+                position: "center-right"
+            });
+
+
+        
+      });
+
+      var basemaps = new Array();
+      basemaps[0] = "streets";
+      basemaps[1] = "hybrid";
+      basemaps[2] = "dark-gray";
+      basemaps[3] = "topo-vector";
+      basemaps[4] = "gray-vector";
+
+      var onlinemap = new Array();
+      onlinemap[0] = "CN_34Capital_Population20210421/FeatureServer";
+
+      function getBaseMap(){
+        var a = document.getElementById("BaseMapList");
+
+        for(var i = 0 ; i < basemaps.length ; i++){
+            var op = document.createElement("p"); 
+            var mapName = document.createTextNode("["+i+"]\t"+basemaps[i]);
+
+            op.appendChild(mapName);
+            //difine text
+            var textId = document.createAttribute("id");
+            textId.value = basemaps[i];
+            op.setAttributeNode(textId);
+
+            //define the action will be execute after click
+            var click = document.createAttribute("onclick");
+            click.value = "changeBaseMap(this)";
+            op.setAttributeNode(click);
+
+            a.appendChild(op);
+        }
+            
+      }
+
+      function getOnlineMap(){
+        var b = document.getElementById("OnlineMapList");
+
+        for(var i = 0 ; i < onlinemap.length ; i++){
+            var op = document.createElement("p"); 
+            var mapName = document.createTextNode("["+i+"]\t"+"name: "+onlinemap[i]);
+
+            op.appendChild(mapName);
+            //difine text
+            var textId = document.createAttribute("id");
+            textId.value = onlinemap[i];
+            op.setAttributeNode(textId);
+
+            //define the action will be execute after click
+            var click = document.createAttribute("onclick");
+            click.value = "changeOnlineMap(this)";
+            op.setAttributeNode(click);
+
+            b.appendChild(op);
+        }
+      }
+
+      function changeBaseMap(element){
+        var a = document.getElementById(element.id).id;
+        alert("you will change your baseMap to "+a+" in a short time ");
+
+        tmpBaseMap.basemap = a;
+      }
+
+      function changeOnlineMap(element){
+        var b = document.getElementById(element.id).id;
+
+        alert("this is the name of layer :"+b);
+
+        tmpBaseMap.layers.push(b);
+      }
+
+
+    </script>
+  </head>
+  <body onload="getBaseMap();getOnlineMap();">
+
+    <div id="header" style="background-color:white;margin: 12px;padding: 2px;">
+        <h1 style="margin-bottom:0;">this is made for exp</h1>
+    </div>
+         
+    <div id="menu" style="background-color:white;height: 380px;width: 400px;float:left;;margin: 12px;padding: 2px;">
+        <div><h3>native esri's baseMap </h3></div>
+        <div id="BaseMapList"></div>
+        <div><h3>Layers info</h3></div>
+        <div id="OnlineMapList"></div>
+        <div><h3>BaseMap Gallery</h3></div>
+        <div id="baseGallery" style="width: 400px; height: 300px; overflow:scroll;"></div>
+    </div>
+
+
+    <div id="viewDiv" style="background-color:#EEEEEE;height:680px;width:800px;float:left;;margin: 12px;padding: 2px;"></div>
+
+    <div id="footer" style="background-color:white;clear:both;text-align:center;;margin: 12px;padding: 2px;">
+    版权 © www.3185706016.huangchendi.com
+    </div>
+         
+
+    
+  </body>
+</html>
